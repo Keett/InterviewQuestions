@@ -1,0 +1,26 @@
+{
+  "Version": 1,
+  "ProjectMap": {
+    "a4bdee0a-2c08-4064-ae3f-171ed1821978": {
+      "ProjectGuid": "a4bdee0a-2c08-4064-ae3f-171ed1821978",
+      "DisplayName": "BitesMulakat",
+      "ColorIndex": 0
+    },
+    "a2fe74e1-b743-11d0-ae1a-00a0c90fffc3": {
+      "ProjectGuid": "a2fe74e1-b743-11d0-ae1a-00a0c90fffc3",
+      "DisplayName": "Miscellaneous Files",
+      "ColorIndex": -1
+    },
+    "5b9e7bc2-cd8d-4784-ade4-973189a771af": {
+      "ProjectGuid": "5b9e7bc2-cd8d-4784-ade4-973189a771af",
+      "DisplayName": "ConsoleApplication1",
+      "ColorIndex": 1
+    },
+    "33be9a55-9211-40c6-ad7c-ea2eeefe56b1": {
+      "ProjectGuid": "33be9a55-9211-40c6-ad7c-ea2eeefe56b1",
+      "DisplayName": "Solution Items",
+      "ColorIndex": 2
+    }
+  },
+  "NextColorIndex": 3
+}
