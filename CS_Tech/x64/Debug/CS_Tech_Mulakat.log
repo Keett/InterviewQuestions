@@ -1,0 +1,5 @@
+﻿  CS_Tech_Mulakat.cpp
+  ParseChessboard.cpp
+  Generating Code...
+D:\PROJECTS\VisualStudio_Projects\CS_Tech_Mulakat\ParseChessboard.cpp(98): warning C4715: 'ParseChessboard::parsePieceType': not all control paths return a value
+  CS_Tech_Mulakat.vcxproj -> D:\PROJECTS\VisualStudio_Projects\CS_Tech_Mulakat\x64\Debug\CS_Tech_Mulakat.exe
