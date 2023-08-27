@@ -208,12 +208,10 @@ private:
     /// <param name="chessboard">Santranç Tahtasý</param>
     void findThreatenedCell(std::vector<std::vector<Piece>>& chessboard) {
 
-        for (int xAxis = 0; xAxis < Chessboard::CHESSBOARD_SIZE; ++xAxis) {
-            for (int yAxis = 0; yAxis < Chessboard::CHESSBOARD_SIZE; ++yAxis) {
-                Piece piece = chessboard[xAxis][yAxis];
-                if (piece.pieceType != PieceType::IDLE || piece.color != Color::IDLE) {
+        for (const auto& xAxis : chessboard) {
+            for (const auto& piece : xAxis) {
+                if (piece.pieceType != PieceType::IDLE || piece.color != Color::IDLE)
                     findThreatenedCellsByPiece(piece, chessboard);
-                }
             }
         }
     }
