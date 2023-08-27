@@ -1,5 +1,4 @@
 #pragma once
-#include <map>
 
 enum class Color {
     IDLE,
@@ -24,8 +23,11 @@ struct Position {
 class Piece
 {
 public:
-   /* Piece();
-    ~Piece();*/
+
+    Piece(Color color, PieceType pieceType, int posX, int posY)
+        : color(color), pieceType(pieceType), position({ posX, posY }) {}
+
+    Piece() : color(Color::IDLE), pieceType(PieceType::IDLE), position({ 0, 0 }) {}
 
     Color color;
     PieceType pieceType;

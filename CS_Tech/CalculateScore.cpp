@@ -3,61 +3,66 @@
 class CalculateScore : public ICalculateScore
 {
 public:
-    virtual void calculateScore(std::vector<std::vector<Piece>>& chessboard) {
-        for (int row = 0; row < 8; ++row) {
-            for (int col = 0; col < 8; ++col) {
-                Piece piece = chessboard[row][col];
+
+    /// <summary>
+    /// Tüm taþlarýn katsayýsýna göre puanlamalarýnýn hesaplanmasýný saðlar.
+    /// </summary>
+    /// <param name="chessboard">Santranç Tahtasý</param>
+    std::map<std::string,double> calculateScore(std::vector<std::vector<Piece>>& chessboard) {
+        
+        findThreatenedCell(chessboard);
+
+        double totalWhiteScore = 0;
+        double totalBlackScore = 0;
+
+        for (int xAxis = 0; xAxis < Chessboard::CHESSBOARD_SIZE; ++xAxis) {
+            for (int yAxis = 0; yAxis < Chessboard::CHESSBOARD_SIZE; ++yAxis) {
+                Piece piece = chessboard[xAxis][yAxis];
+                bool is_threatened = threatenedPieces[{xAxis, yAxis}];
+
                 if (piece.pieceType != PieceType::IDLE || piece.color != Color::IDLE) {
-                    findThreatenedCells(piece, chessboard);
+
+                    double score = calculatePieceScore(piece, is_threatened);
+                    (piece.color == Color::SIYAH) ? totalBlackScore += score : totalWhiteScore += score;
                 }
             }
         }
+        scoreMap["WhiteScore"] = totalWhiteScore;
+        scoreMap["BlackScore"] = totalBlackScore;
 
-        // Taþlarýn puanlarýný hesapla
-        double total_white_score = 0;
-        double total_black_score = 0;
-
-        for (int row = 0; row < 8; ++row) {
-            for (int col = 0; col < 8; ++col) {
-                Piece piece = chessboard[row][col];
-                bool is_threatened = threatened_pieces[{row, col}];
-
-                if (piece.pieceType != PieceType::IDLE || piece.color != Color::IDLE) {
-                    if (piece.color == Color::SIYAH) {
-                        total_black_score += calculatePieceScore(piece, is_threatened);
-                    }
-                    else {
-                        total_white_score += calculatePieceScore(piece, is_threatened);
-                    }
-                }
-            }
-        }
-
-        /*scoreMap["WhiteScore"] = total_white_score;
-        scoreMap["BlackScore"] = total_black_score;*/
-
-        std::cout << "White Score: " << total_white_score << std::endl;
-        std::cout << "Black Score: " << total_black_score << std::endl;
+        return scoreMap;
     }
 
 private:
-    std::map<std::pair<int, int>, bool> threatened_pieces;
+    //DEFINATIONS
+    std::map<std::pair<int, int>, bool> threatenedPieces;
     std::map<std::string, double> scoreMap;
-
     std::map<PieceType, int> pieceScores = {
-            {PieceType::PÝYON, 1},
-            {PieceType::AT, 3},
-            {PieceType::FIL, 3},
-            {PieceType::KALE, 5},
-            {PieceType::VEZIR, 9},
-            {PieceType::SAH, 100}
+        {PieceType::PÝYON, 1},
+        {PieceType::AT, 3},
+        {PieceType::FIL, 3},
+        {PieceType::KALE, 5},
+        {PieceType::VEZIR, 9},
+        {PieceType::SAH, 100}
     };
 
     // Inherited via ICalculateScore
-    virtual bool isChessboardControl(int newPosX, int newPosY, std::vector<std::vector<Piece>>& chessboard, const Piece& piece) override
+
+    /// <summary>
+    /// Santraç taþýnýn tehdit durumlarýnýn kontrolü için oluþturulmuþ ortak logic yapýsý
+    /// (Bulunan tehdit alaný santranç taþýnýn alanýnýn içinde mi?,
+    /// Santranç tahtasýnda bulunan pozisyon deðerlerinde taþ var mý?,
+    /// bulunan taþ tehdit mi?)
+    /// </summary>
+    /// <param name="newPosX">Bulunan yeni posX deðeri</param>
+    /// <param name="newPosY">Bulunan yeni posY deðeri</param>
+    /// <param name="chessboard">Santranç Tahtasý</param>
+    /// <param name="piece">Santranç Taþý</param>
+    /// <returns>True veya False</returns>
+    bool isChessboardControl(int newPosX, int newPosY, std::vector<std::vector<Piece>>& chessboard, const Piece& piece) override
     {
-        if (newPosX >= 0 && newPosX < 8 &&
-            newPosY >= 0 && newPosY < 8 &&
+        if (newPosX >= 0 && newPosX < Chessboard::CHESSBOARD_SIZE &&
+            newPosY >= 0 && newPosY < Chessboard::CHESSBOARD_SIZE &&
             chessboard[newPosX][newPosY].pieceType != PieceType::IDLE &&
             piece.color != chessboard[newPosX][newPosY].color) {
             return true;
@@ -65,53 +70,69 @@ private:
         return false;
     }
 
-    virtual void findThreatenedCells(const Piece& piece, std::vector<std::vector<Piece>>& chessboard) override
+    /// <summary>
+    /// Taþa göre tehdit edilen santranç taþlarýnýn konumlarýnýn bulunmasýný saðlar.
+    /// </summary>
+    /// <param name="piece">Santranç Taþý</param>
+    /// <param name="chessboard">Santranç Tahtasý</param>
+    void findThreatenedCellsByPiece(const Piece& piece, std::vector<std::vector<Piece>>& chessboard) override
     {
         switch (piece.pieceType) {
+        /// <summary>
+        /// Piyon tehditleri
+        /// Beyaz piyonlarýn yukarý yönlü ve siyah piyonlarýn aþaðý yönlü hareketi mevcuttur.
+        /// Bu sebeple newPosX deðerleri renge göre kontrol edilmektedir.
+        /// </summary>
+        /// <param name="piece">Santranç Taþý</param>
+        /// <param name="chessboard">Santraç Tahtasý</param>
         case PieceType::PÝYON:
-            // Piyonun hareket kurallarýna göre tehdit ettiði hücreleri ekleyebilirsiniz.
-            // Örneðin, taþýn rengine göre ileri sol ve sað hücreleri tehdit edebilir.
-            // Piyon tehditleri
-
         {
-            int dy[] = { -1, 1 };
-            int newRow = -1;
-            int newCol = -1;
+            int yAxisMotion[] = { -1, 1 };
+            int newPosX = -1;
+            int newPosY = -1;
 
             for (int i = 0; i < 2; ++i) {
-                newRow = (piece.color == Color::BEYAZ) ? (piece.position.posX - 1) : (piece.position.posX + 1);
-                newCol = (piece.position.posY) + dy[i];
+                newPosX = (piece.color == Color::BEYAZ) ? (piece.position.posX - 1) : (piece.position.posX + 1);
+                newPosY = (piece.position.posY) + yAxisMotion[i];
 
-                if (isChessboardControl(newRow, newCol, chessboard, piece)) {
-                    threatened_pieces[{newRow, newCol}] = true;
+                if (isChessboardControl(newPosX, newPosY, chessboard, piece)) {
+                    threatenedPieces[{newPosX, newPosY}] = true;
                 }
             }
         }
         break;
-
+        /// <summary>
+        /// At tehditleri 
+        /// L þeklinde tehdit hareketleri mevcut (2 yukarý - 1 sola, 2 yukarý - 1 saða, 2 sola - 1 yukarý, 2 saða - 1 yukarý gibi.)
+        /// </summary>
+        /// <param name="piece">Santranç Taþý</param>
+        /// <param name="chessboard">Santraç Tahtasý</param>
         case PieceType::AT:
-            // Atýn hareket kurallarýna göre tehdit ettiði hücreleri ekleyebilirsiniz.
-            // Örneðin, L þeklinde hareket ederek diðer hücreleri tehdit eder.
-            // (2 yukarý-1 sola, 2 yukarý-1 saða, 2 sola-1 yukarý, 2 saða-1 yukarý, vb.)
         {
-            int dx[] = { 2, 2, 1, 1, -1, -1, -2, -2 };
-            int dy[] = { 1, -1, 2, -2, 2, -2, 1, -1 };
-            for (int i = 0; i < 8; ++i) {
-                int newRow = piece.position.posX + dx[i];
-                int newCol = piece.position.posY + dy[i];
+            int xAxisMotion[] = { 2, 2, 1, 1, -1, -1, -2, -2 };
+            int yAxisMotion[] = { 1, -1, 2, -2, 2, -2, 1, -1 };
 
-                if (isChessboardControl(newRow, newCol, chessboard, piece)) {
-                    threatened_pieces[{newRow, newCol}] = true;
+            for (int i = 0; i < 8; ++i) {
+                int newPosX = piece.position.posX + xAxisMotion[i];
+                int newPosY = piece.position.posY + yAxisMotion[i];
+
+                if (isChessboardControl(newPosX, newPosY, chessboard, piece)) {
+                    threatenedPieces[{newPosX, newPosY}] = true;
                 }
             }
         }
         break;
-
+        /// <summary>
+        /// Vezir tehditleri
+        /// Vezirin çapraz ve düz eksenli hareketi mevcuttur.
+        /// Vezirin hareketi kendi grubundan taþa kadar devam eder, kendi grubundan deðilse tehdittir.  
+        /// </summary>
+        /// <param name="piece">Santranç Taþý</param>
+        /// <param name="chessboard">Santranç Tahtasý</param>
         case PieceType::VEZIR:
-            //Vezir tehditleri
             for (int i = 1; piece.position.posX + i < 8; ++i) {
                 if (isChessboardControl(piece.position.posX + i, piece.position.posY, chessboard, piece)) {
-                    threatened_pieces[{piece.position.posX + i, piece.position.posY}] = true;  // Aþaðý
+                    threatenedPieces[{piece.position.posX + i, piece.position.posY}] = true;  // Aþaðý Hareket
                     break;
                 }
                 if (piece.color == chessboard[piece.position.posX + i][piece.position.posY].color) {
@@ -120,7 +141,7 @@ private:
             }
             for (int i = 1; piece.position.posX - i >= 0; ++i) {
                 if (isChessboardControl(piece.position.posX - i, piece.position.posY, chessboard, piece)) {
-                    threatened_pieces[{piece.position.posX - i, piece.position.posY}] = true;  // Yukarý
+                    threatenedPieces[{piece.position.posX - i, piece.position.posY}] = true;  // Yukarý Hareket
                     break;
                 }
                 if (piece.color == chessboard[piece.position.posX - i][piece.position.posY].color)
@@ -128,7 +149,7 @@ private:
             }
             for (int i = 1; piece.position.posY + i < 8; ++i) {
                 if (isChessboardControl(piece.position.posX, piece.position.posY + i, chessboard, piece)) {
-                    threatened_pieces[{piece.position.posX, piece.position.posY + i}] = true;  // Sað
+                    threatenedPieces[{piece.position.posX, piece.position.posY + i}] = true;  // Sað Yönlü Hareket
                     break;
                 }
                 if (piece.color == chessboard[piece.position.posX][piece.position.posY + i].color)
@@ -136,7 +157,7 @@ private:
             }
             for (int i = 1; piece.position.posY - i >= 0; ++i) {
                 if (isChessboardControl(piece.position.posX, piece.position.posY - i, chessboard, piece)) {
-                    threatened_pieces[{piece.position.posX, piece.position.posY - i}] = true;  // Sol
+                    threatenedPieces[{piece.position.posX, piece.position.posY - i}] = true;  // Sol Yönlü Hareket
                     break;
                 }
                 if (piece.color == chessboard[piece.position.posX][piece.position.posY - i].color)
@@ -144,7 +165,7 @@ private:
             }
             for (int i = 1; piece.position.posX + i < 8 && piece.position.posY + i < 8; ++i) {
                 if (isChessboardControl(piece.position.posX + i, piece.position.posY + i, chessboard, piece)) {
-                    threatened_pieces[{piece.position.posX + i, piece.position.posY + i}] = true;  // Sað üst
+                    threatenedPieces[{piece.position.posX + i, piece.position.posY + i}] = true;  // Sað Üst Yönlü Hareket
                     break;
                 }
                 if (piece.color == chessboard[piece.position.posX + i][piece.position.posY + i].color)
@@ -152,7 +173,7 @@ private:
             }
             for (int i = 1; piece.position.posX + i < 8 && piece.position.posY - i >= 0; ++i) {
                 if (isChessboardControl(piece.position.posX + i, piece.position.posY - i, chessboard, piece)) {
-                    threatened_pieces[{piece.position.posX + i, piece.position.posY - i}] = true;  // Sol üst
+                    threatenedPieces[{piece.position.posX + i, piece.position.posY - i}] = true;  // Sol Üst Yönlü Hareket
                     break;
                 }
                 if (piece.color == chessboard[piece.position.posX + i][piece.position.posY - i].color)
@@ -160,7 +181,7 @@ private:
             }
             for (int i = 1; piece.position.posX - i >= 0 && piece.position.posY + i < 8; ++i) {
                 if (isChessboardControl(piece.position.posX - i, piece.position.posY + i, chessboard, piece)) {
-                    threatened_pieces[{piece.position.posX - i, piece.position.posY + i}] = true;  // Sað alt
+                    threatenedPieces[{piece.position.posX - i, piece.position.posY + i}] = true;  // Sað Alt Yönlü Hareket
                     break;
                 }
                 if (piece.color == chessboard[piece.position.posX - i][piece.position.posY + i].color)
@@ -168,7 +189,7 @@ private:
             }
             for (int i = 1; piece.position.posX - i >= 0 && piece.position.posY - i >= 0; ++i) {
                 if (isChessboardControl(piece.position.posX - i, piece.position.posY - i, chessboard, piece)) {
-                    threatened_pieces[{piece.position.posX - i, piece.position.posY - i}] = true;  // Sol alt
+                    threatenedPieces[{piece.position.posX - i, piece.position.posY - i}] = true;  // Sol Alt Yönlü Hareket
                     break;
                 }
                 if (piece.color == chessboard[piece.position.posX - i][piece.position.posY - i].color)
@@ -180,10 +201,33 @@ private:
             break;
         }
     }
+    
+    /// <summary>
+    /// Tüm tehdit edilen taþlarýn bulunmasýný saðlar.
+    /// </summary>
+    /// <param name="chessboard">Santranç Tahtasý</param>
+    void findThreatenedCell(std::vector<std::vector<Piece>>& chessboard) {
 
-    virtual double calculatePieceScore(Piece& piece, bool is_threatened) override
+        for (int xAxis = 0; xAxis < Chessboard::CHESSBOARD_SIZE; ++xAxis) {
+            for (int yAxis = 0; yAxis < Chessboard::CHESSBOARD_SIZE; ++yAxis) {
+                Piece piece = chessboard[xAxis][yAxis];
+                if (piece.pieceType != PieceType::IDLE || piece.color != Color::IDLE) {
+                    findThreatenedCellsByPiece(piece, chessboard);
+                }
+            }
+        }
+    }
+
+    /// <summary>
+    /// Santranç taþýnýn hesaplamaya alýnacak katsayý deðerinin belirlenmesi, 
+    /// tehdit durumunda ise 2'ye bölünecek, deðilse default hesaplama katsayýsý dikkate alýnacak
+    /// </summary>
+    /// <param name="piece">Santranç Taþý</param>
+    /// <param name="isThreatened">Tehdit durumunu tutan deðiþken</param>
+    /// <returns></returns>
+    double calculatePieceScore(Piece& piece, bool isThreatened) override
     {
-        if (is_threatened) {
+        if (isThreatened) {
             return pieceScores[piece.pieceType] / 2.0;
         }
         return pieceScores[piece.pieceType];

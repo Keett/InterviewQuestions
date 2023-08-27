@@ -9,12 +9,23 @@
 #include "CalculateScore.cpp"
 
 int main() {
+
     ParseChessboard parseChessboard;
-    std::vector<std::vector<Piece>> chessboard(parseChessboard.CHESSBOARD_SIZE, std::vector<Piece>(parseChessboard.CHESSBOARD_SIZE));
+    std::vector<std::vector<Piece>> chessboard(Chessboard::CHESSBOARD_SIZE, std::vector<Piece>(Chessboard::CHESSBOARD_SIZE));
     chessboard = parseChessboard.parse();
 
-    CalculateScore calculateScore;
-    calculateScore.calculateScore(chessboard);
+    if (!chessboard.empty()) {
+        try {
+            CalculateScore calculateScore;
+            auto scoreInfo = calculateScore.calculateScore(chessboard);
+
+            std::cout << "Total White Score: " << scoreInfo["WhiteScore"] << std::endl;
+            std::cout << "Total Black Score: " << scoreInfo["BlackScore"] << std::endl;
+        }
+        catch (const std::exception& ex) {
+            std::cout << "Exception : " << ex.what();
+        }
+    }
 
     return 0;
 }
