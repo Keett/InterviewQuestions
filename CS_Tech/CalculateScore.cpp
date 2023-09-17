@@ -130,73 +130,24 @@ private:
         /// <param name="piece">Santranç Taþý</param>
         /// <param name="chessboard">Santranç Tahtasý</param>
         case PieceType::VEZIR:
-            for (int i = 1; piece.position.posX + i < 8; ++i) {
-                if (isChessboardControl(piece.position.posX + i, piece.position.posY, chessboard, piece)) {
-                    threatenedPieces[{piece.position.posX + i, piece.position.posY}] = true;  // Aþaðý Hareket
-                    break;
-                }
-                if (piece.color == chessboard[piece.position.posX + i][piece.position.posY].color) {
-                    break;
-                }
-            }
-            for (int i = 1; piece.position.posX - i >= 0; ++i) {
-                if (isChessboardControl(piece.position.posX - i, piece.position.posY, chessboard, piece)) {
-                    threatenedPieces[{piece.position.posX - i, piece.position.posY}] = true;  // Yukarý Hareket
-                    break;
-                }
-                if (piece.color == chessboard[piece.position.posX - i][piece.position.posY].color)
-                    break;
-            }
-            for (int i = 1; piece.position.posY + i < 8; ++i) {
-                if (isChessboardControl(piece.position.posX, piece.position.posY + i, chessboard, piece)) {
-                    threatenedPieces[{piece.position.posX, piece.position.posY + i}] = true;  // Sað Yönlü Hareket
-                    break;
-                }
-                if (piece.color == chessboard[piece.position.posX][piece.position.posY + i].color)
-                    break;
-            }
-            for (int i = 1; piece.position.posY - i >= 0; ++i) {
-                if (isChessboardControl(piece.position.posX, piece.position.posY - i, chessboard, piece)) {
-                    threatenedPieces[{piece.position.posX, piece.position.posY - i}] = true;  // Sol Yönlü Hareket
-                    break;
-                }
-                if (piece.color == chessboard[piece.position.posX][piece.position.posY - i].color)
-                    break;
-            }
-            for (int i = 1; piece.position.posX + i < 8 && piece.position.posY + i < 8; ++i) {
-                if (isChessboardControl(piece.position.posX + i, piece.position.posY + i, chessboard, piece)) {
-                    threatenedPieces[{piece.position.posX + i, piece.position.posY + i}] = true;  // Sað Üst Yönlü Hareket
-                    break;
-                }
-                if (piece.color == chessboard[piece.position.posX + i][piece.position.posY + i].color)
-                    break;
-            }
-            for (int i = 1; piece.position.posX + i < 8 && piece.position.posY - i >= 0; ++i) {
-                if (isChessboardControl(piece.position.posX + i, piece.position.posY - i, chessboard, piece)) {
-                    threatenedPieces[{piece.position.posX + i, piece.position.posY - i}] = true;  // Sol Üst Yönlü Hareket
-                    break;
-                }
-                if (piece.color == chessboard[piece.position.posX + i][piece.position.posY - i].color)
-                    break;
-            }
-            for (int i = 1; piece.position.posX - i >= 0 && piece.position.posY + i < 8; ++i) {
-                if (isChessboardControl(piece.position.posX - i, piece.position.posY + i, chessboard, piece)) {
-                    threatenedPieces[{piece.position.posX - i, piece.position.posY + i}] = true;  // Sað Alt Yönlü Hareket
-                    break;
-                }
-                if (piece.color == chessboard[piece.position.posX - i][piece.position.posY + i].color)
-                    break;
-            }
-            for (int i = 1; piece.position.posX - i >= 0 && piece.position.posY - i >= 0; ++i) {
-                if (isChessboardControl(piece.position.posX - i, piece.position.posY - i, chessboard, piece)) {
-                    threatenedPieces[{piece.position.posX - i, piece.position.posY - i}] = true;  // Sol Alt Yönlü Hareket
-                    break;
-                }
-                if (piece.color == chessboard[piece.position.posX - i][piece.position.posY - i].color)
-                    break;
-            }
-            break;
+        {
+            int xAxisMotion[] = { 1, -1, 0, 0, 1, 1, -1, -1 };
+            int yAxisMotion[] = { 0, 0, 1, -1, 1, -1, 1, -1 };
 
+            for (int axis = 0; axis < 8; axis++)
+            {
+                for (int i = 1; piece.position.posX + xAxisMotion[axis] < 8; ++i) {
+                    if (isChessboardControl(piece.position.posX + xAxisMotion[axis], piece.position.posY + yAxisMotion[axis], chessboard, piece)) {
+                        threatenedPieces[{piece.position.posX + xAxisMotion[axis], piece.position.posY + yAxisMotion[axis]}] = true;
+                        break;
+                    }
+                    if (piece.color == chessboard[piece.position.posX + xAxisMotion[axis]][piece.position.posY + yAxisMotion[axis]].color)
+                        break;
+                }
+            }
+        }
+            break;
+        
         default:
             break;
         }
