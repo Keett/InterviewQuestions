@@ -5,9 +5,9 @@ class CalculateScore : public ICalculateScore
 public:
 
     /// <summary>
-    /// Tüm taşların katsayısına göre puanlamalarının hesaplanmasını sağlar.
+    /// TÃ¼m taÃ¾larÃ½n katsayÃ½sÃ½na gÃ¶re puanlamalarÃ½nÃ½n hesaplanmasÃ½nÃ½ saÃ°lar.
     /// </summary>
-    /// <param name="chessboard">Santranç Tahtası</param>
+    /// <param name="chessboard">SantranÃ§ TahtasÃ½</param>
     std::map<std::string,double> calculateScore(std::vector<std::vector<Piece>>& chessboard) {
         
         findThreatenedCell(chessboard);
@@ -38,7 +38,7 @@ private:
     std::map<std::pair<int, int>, bool> threatenedPieces;
     std::map<std::string, double> scoreMap;
     std::map<PieceType, int> pieceScores = {
-        {PieceType::PİYON, 1},
+        {PieceType::PÃYON, 1},
         {PieceType::AT, 3},
         {PieceType::FIL, 3},
         {PieceType::KALE, 5},
@@ -49,15 +49,15 @@ private:
     // Inherited via ICalculateScore
 
     /// <summary>
-    /// Santraç taşının tehdit durumlarının kontrolü için oluşturulmuş ortak logic yapısı
-    /// (Bulunan tehdit alanı santranç taşının alanının içinde mi?,
-    /// Santranç tahtasında bulunan pozisyon değerlerinde taş var mı?,
-    /// bulunan taş tehdit mi?)
+    /// SantraÃ§ taÃ¾Ã½nÃ½n tehdit durumlarÃ½nÃ½n kontrolÃ¼ iÃ§in oluÃ¾turulmuÃ¾ ortak logic yapÃ½sÃ½
+    /// (Bulunan tehdit alanÃ½ santranÃ§ taÃ¾Ã½nÃ½n alanÃ½nÃ½n iÃ§inde mi?,
+    /// SantranÃ§ tahtasÃ½nda bulunan pozisyon deÃ°erlerinde taÃ¾ var mÃ½?,
+    /// bulunan taÃ¾ tehdit mi?)
     /// </summary>
-    /// <param name="newPosX">Bulunan yeni posX değeri</param>
-    /// <param name="newPosY">Bulunan yeni posY değeri</param>
-    /// <param name="chessboard">Santranç Tahtası</param>
-    /// <param name="piece">Santranç Taşı</param>
+    /// <param name="newPosX">Bulunan yeni posX deÃ°eri</param>
+    /// <param name="newPosY">Bulunan yeni posY deÃ°eri</param>
+    /// <param name="chessboard">SantranÃ§ TahtasÃ½</param>
+    /// <param name="piece">SantranÃ§ TaÃ¾Ã½</param>
     /// <returns>True veya False</returns>
     bool isChessboardControl(int newPosX, int newPosY, std::vector<std::vector<Piece>>& chessboard, const Piece& piece) override
     {
@@ -71,21 +71,21 @@ private:
     }
 
     /// <summary>
-    /// Taşa göre tehdit edilen santranç taşlarının konumlarının bulunmasını sağlar.
+    /// TaÃ¾a gÃ¶re tehdit edilen santranÃ§ taÃ¾larÃ½nÃ½n konumlarÃ½nÃ½n bulunmasÃ½nÃ½ saÃ°lar.
     /// </summary>
-    /// <param name="piece">Santranç Taşı</param>
-    /// <param name="chessboard">Santranç Tahtası</param>
+    /// <param name="piece">SantranÃ§ TaÃ¾Ã½</param>
+    /// <param name="chessboard">SantranÃ§ TahtasÃ½</param>
     void findThreatenedCellsByPiece(const Piece& piece, std::vector<std::vector<Piece>>& chessboard) override
     {
         switch (piece.pieceType) {
         /// <summary>
         /// Piyon tehditleri
-        /// Beyaz piyonların yukarı yönlü ve siyah piyonların aşağı yönlü hareketi mevcuttur.
-        /// Bu sebeple newPosX değerleri renge göre kontrol edilmektedir.
+        /// Beyaz piyonlarÃ½n yukarÃ½ yÃ¶nlÃ¼ ve siyah piyonlarÃ½n aÃ¾aÃ°Ã½ yÃ¶nlÃ¼ hareketi mevcuttur.
+        /// Bu sebeple newPosX deÃ°erleri renge gÃ¶re kontrol edilmektedir.
         /// </summary>
-        /// <param name="piece">Santranç Taşı</param>
-        /// <param name="chessboard">Santraç Tahtası</param>
-        case PieceType::PİYON:
+        /// <param name="piece">SantranÃ§ TaÃ¾Ã½</param>
+        /// <param name="chessboard">SantraÃ§ TahtasÃ½</param>
+        case PieceType::PÃYON:
         {
             int yAxisMotion[] = { -1, 1 };
             int newPosX = -1;
@@ -103,10 +103,10 @@ private:
         break;
         /// <summary>
         /// At tehditleri 
-        /// L şeklinde tehdit hareketleri mevcut (2 yukarı - 1 sola, 2 yukarı - 1 sağa, 2 sola - 1 yukarı, 2 sağa - 1 yukarı gibi.)
+        /// L Ã¾eklinde tehdit hareketleri mevcut (2 yukarÃ½ - 1 sola, 2 yukarÃ½ - 1 saÃ°a, 2 sola - 1 yukarÃ½, 2 saÃ°a - 1 yukarÃ½ gibi.)
         /// </summary>
-        /// <param name="piece">Santranç Taşı</param>
-        /// <param name="chessboard">Santraç Tahtası</param>
+        /// <param name="piece">SantranÃ§ TaÃ¾Ã½</param>
+        /// <param name="chessboard">SantraÃ§ TahtasÃ½</param>
         case PieceType::AT:
         {
             int xAxisMotion[] = { 2, 2, 1, 1, -1, -1, -2, -2 };
@@ -124,11 +124,11 @@ private:
         break;
         /// <summary>
         /// Vezir tehditleri
-        /// Vezirin çapraz ve düz eksenli hareketi mevcuttur.
-        /// Vezirin hareketi kendi grubundan taşa kadar devam eder, kendi grubundan değilse tehdittir.  
+        /// Vezirin Ã§apraz ve dÃ¼z eksenli hareketi mevcuttur.
+        /// Vezirin hareketi kendi grubundan taÃ¾a kadar devam eder, kendi grubundan deÃ°ilse tehdittir.  
         /// </summary>
-        /// <param name="piece">Santranç Taşı</param>
-        /// <param name="chessboard">Santranç Tahtası</param>
+        /// <param name="piece">SantranÃ§ TaÃ¾Ã½</param>
+        /// <param name="chessboard">SantranÃ§ TahtasÃ½</param>
         case PieceType::VEZIR:
         {
             int xAxisMotion[] = { 1, -1, 0, 0, 1, 1, -1, -1 };
@@ -154,9 +154,9 @@ private:
     }
     
     /// <summary>
-    /// Tüm tehdit edilen taşların bulunmasını sağlar.
+    /// TÃ¼m tehdit edilen taÃ¾larÃ½n bulunmasÃ½nÃ½ saÃ°lar.
     /// </summary>
-    /// <param name="chessboard">Santranç Tahtası</param>
+    /// <param name="chessboard">SantranÃ§ TahtasÃ½</param>
     void findThreatenedCell(std::vector<std::vector<Piece>>& chessboard) {
 
         for (const auto& xAxis : chessboard) {
@@ -168,18 +168,15 @@ private:
     }
 
     /// <summary>
-    /// Santranç taşının hesaplamaya alınacak katsayı değerinin belirlenmesi, 
-    /// tehdit durumunda ise 2'ye bölünecek, değilse default hesaplama katsayısı dikkate alınacak
+    /// SantranÃ§ taÃ¾Ã½nÃ½n hesaplamaya alÃ½nacak katsayÃ½ deÃ°erinin belirlenmesi, 
+    /// tehdit durumunda ise 2'ye bÃ¶lÃ¼necek, deÃ°ilse default hesaplama katsayÃ½sÃ½ dikkate alÃ½nacak
     /// </summary>
-    /// <param name="piece">Santranç Taşı</param>
-    /// <param name="isThreatened">Tehdit durumunu tutan değişken</param>
+    /// <param name="piece">SantranÃ§ TaÃ¾Ã½</param>
+    /// <param name="isThreatened">Tehdit durumunu tutan deÃ°iÃ¾ken</param>
     /// <returns></returns>
     double calculatePieceScore(Piece& piece, bool isThreatened) override
     {
-        if (isThreatened) {
-            return pieceScores[piece.pieceType] / 2.0;
-        }
-        return pieceScores[piece.pieceType];
+        return isThreatened ? (pieceScores[piece.pieceType] / 2.0) : pieceScores[piece.pieceType];
     }
 
 };
